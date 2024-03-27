@@ -1,0 +1,88 @@
+Команды в консоли Django?
+
+1.	Создать двух пользователей (с помощью метода User.objects.create_user('username')).
+
+user1 = User.objects.create(username = ‘Андрей’)
+user2 = User.objects.create(username = ‘Анна’)
+
+2.	Создать два объекта модели Author, связанные с пользователями.
+
+author1 = Author.objects.create(user = User.objects.get(pk=1))
+author2 = Author.objects.create(user = User.objects.get(pk=2))
+
+3.	Добавить 4 категории в модель Category.
+
+cat1 = Category.objects.create(name_category = ‘Спорт’)
+cat2 = Category.objects.create(name_category = ‘Еда’)
+cat3 = Category.objects.create(name_category = ‘Искусство’)
+cat4 = Category.objects.create(name_category = ‘Космос’)
+
+4.	Добавить 2 статьи и 1 новость.
+
+post1 = Post.objects.create(author = author1, choice = “Статья”, title = “Здоровое питание”, text = “Здоровое питание включает следующие компоненты: Фрукты, овощи, бобовые (например, чечевица, фасоль), орехи и цельные злаки (например, непереработанная кукуруза, просо, овес, пшеница и неочищенный рис). По меньшей мере, 400 г (то есть пять порций) фруктов и овощей в день (2), кроме картофеля, сладкого картофеля, маниока и других крахмалсодержащих корнеплодов. Свободные сахара должны составлять менее 10% от общей потребляемой энергии (2, 7). Жиры должны составлять менее 30% от общей потребляемой энергии (1, 2, 3).”)
+post2 = Post.objects.create(author = Author.objects.get(pk=1), choice = «Новости», title = “ПРОСТО КОСМОС”, text = “С давних времён таинственные просторы космоса манили людей не меньше, чем глубины океана. Многие учёные в сфере освоения космоса пытались раскрыть его секреты. Звездное небо всегда привлекало взоры людей, люди мечтали узнать о космосе как можно больше. Бренд-шеф ЦМТ Михаил Кузнецов представит гастроужин из 6 блюд, которые раскроют богатую палитру вкусов, присутствующих в меню на современных космических станциях.”)
+post3 = Post.objects.create(author = Author.objects.get(pk=2), choice = «Статья», title = “Образ космоса в искусстве XX века”, text = “Концепция визуального исследования на тему "Космос в изобразительном искусстве 20 века" основана на идее изучения способов, которыми художники выражали свое восприятие космоса и его роли в человеческой жизни. Среди примеров абстрактного изображения космоса можно найти работу Павла Филонова. Его изображение космоса хаотично, образ "беспредметен". 12 апреля 1961 года Юрий Гагарин совершил первый полет в открытый космос, что стало ключевым и важным событием для всего мира. Изображение великих людей было популярно на протяжении многих веков. Один из самых узнаваемых портретов Юрия Гагарина был создан Андреем Плотновым.”)
+
+5.	Присвоить им категории (как минимум в одной статье/новости должно быть не меньше 2 категорий).
+PostCategory.objects.create(post = post1, category = Category.objects.get(pk=1))
+PostCategory.objects.create(post = post1, category = Category.objects.get(pk=2))
+PostCategory.objects.create(post = post2, category = Category.objects.get(pk=1))
+PostCategory.objects.create(post = post2, category = Category.objects.get(pk=2))
+PostCategory.objects.create(post = post2, category = Category.objects.get(pk=4))
+PostCategory.objects.create(post = post3, category = Category.objects.get(pk=3))
+PostCategory.objects.create(post = post3, category = Category.objects.get(pk=4))
+
+6.	Создать как минимум 4 комментария к разным объектам модели Post (в каждом объекте должен быть как минимум один комментарий).
+
+Comment.objects.create(post_comment = post1, user_comment = User.objects.get(pk=2), text_comment = “Здорово!”)
+Comment.objects.create(post_comment = post2, user_comment = User.objects.get(pk=1),  text_comment = “Круто!”)
+Comment.objects.create(post_comment = post2, user_comment = User.objects.get(pk=2),  text_comment = “Молодец!”)
+Comment.objects.create(post_comment = post3, user_comment = User.objects.get(pk=1), text_comment = “Класс!”)
+
+7.	Применяя функции like() и dislike() к статьям/новостям и комментариям, скорректировать рейтинги этих объектов.
+
+Post.objects.get(pk=1).like()
+Post.objects.get(pk=1).like()
+Post.objects.get(pk=1).dislike()
+Post.objects.get(pk=2).like()
+Post.objects.get(pk=2).like()
+Post.objects.get(pk=2).like()
+Post.objects.get(pk=3).like()
+Post.objects.get(pk=3).like()
+
+Comment.objects.get(pk=1).like()
+Comment.objects.get(pk=1).like()
+Comment.objects.get(pk=2).like()
+Comment.objects.get(pk=2).dislike()
+Comment.objects.get(pk=3).like()
+Comment.objects.get(pk=4).like()
+Comment.objects.get(pk=4).like()
+Comment.objects.get(pk=4).like()
+
+8.	Обновить рейтинги пользователей.
+
+author1 = Author.objects.get(pk=1)
+author1.update_rating()
+author1.user_rating
+author2 = Author.objects.get(pk=2)
+author2.update_rating()
+author2.user_rating
+
+9.	Вывести username и рейтинг лучшего пользователя (применяя сортировку и возвращая поля первого объекта).
+
+Author.objects.order_by('-user_rating').first().user.username
+Author.objects.order_by('-user_rating').values('user__username', 'user_rating').first()
+
+10.	Вывести дату добавления, username автора, рейтинг, заголовок и превью лучшей статьи, основываясь на лайках/дислайках к этой статье.
+
+Post.objects.order_by('-post_rating').first()
+Post.objects.order_by('-post_rating').first().author.user.username
+Post.objects.order_by('-post_rating').values('time_post', 'post_rating', 'title').first()
+Post.objects.order_by('-post_rating').first().preview()
+
+11.	Вывести все комментарии (дата, пользователь, рейтинг, текст) к этой статье.
+
+Comment.objects.all().order_by('-post_comment').values('time_comment', 'user_comment', 'rating_comment', 'text_comment').first()
+Comment.objects.all().order_by('-post_comment').first().user_comment.username
+
+
